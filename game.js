@@ -10,6 +10,8 @@ import { createCircles, getAreaCovered } from "./utils.js"
 
 // maybe make this class Level and pass level num here or level configs fetched from class Game
 // and create class Game that manages levels and other stuff
+
+//Stop moving balls when level lost
 export class Game {
   /**
    * @param {CanvasRenderingContext2D} ctx
@@ -21,18 +23,19 @@ export class Game {
     ]
 
     // no scrolling or this gets f'ed
-    const canvasCoords = canvas.getBoundingClientRect()
+    this.canvasCoords = canvas.getBoundingClientRect()
 
     this.ctx = ctx
     this.rectangles = initRectangles || []
     this.rectanglesCount = initRectangles.length
-    this.circles = createCircles(2, this.ctx)
+    this.circles = createCircles(1, this.ctx)
 
     this.playerRectX = 0
     this.playerRectY = 0
     this.playerRectH = 0
     this.playerRectW = 0
     this.drawingRect = false
+    this.previewRect = null
 
     // need to paint first to get init Rectangles area
     this.areaCovered = (() => {
@@ -45,56 +48,74 @@ export class Game {
     this.leveWin = false
 
     document.addEventListener("mousedown", e => {
-      this.drawingRect = true
-      this.playerRectX = e.x - canvasCoords.left
-      this.playerRectY = e.y - canvasCoords.top
+      const rx = e.x - this.canvasCoords.left
+      const ry = e.y - this.canvasCoords.top
+      this.previewRect = new Rectangle({ x: rx, y: ry, w: 0, h: 0 }, "green")
     })
 
     document.addEventListener("mousemove", e => {
-      if (this.drawingRect) {
-        this.playerRectW = e.x - canvasCoords.left - this.playerRectX
-        this.playerRectH = e.y - canvasCoords.top - this.playerRectY
+      if (this.previewRect) {
+        const rw = e.x - this.canvasCoords.left - this.previewRect.coords.x
+        const rh = e.y - this.canvasCoords.top - this.previewRect.coords.y
+
+        this.previewRect = new Rectangle(
+          { x: this.previewRect.coords.x, y: this.previewRect.coords.y, w: rw, h: rh },
+          "green"
+        )
       }
     })
 
     // get this into a separate fn?
     document.addEventListener("mouseup", _ => {
-      if (!this.drawingRect) return
-      this.drawingRect = false
+      if (!this.previewRect) return
 
-      // calc new rectangle coords
-      const rw = Math.abs(this.playerRectW)
-      const rh = Math.abs(this.playerRectH)
-      let rx = this.playerRectW > 0 ? this.playerRectX : this.playerRectX - rw
-      let ry = this.playerRectH > 0 ? this.playerRectY : this.playerRectY - rh
-
-      // reset player rectangle coords
-      this.playerRectX = 0
-      this.playerRectY = 0
-      this.playerRectH = 0
-      this.playerRectW = 0
+      const rw = Math.abs(this.previewRect.coords.w)
+      const rh = Math.abs(this.previewRect.coords.h)
+      const rx = this.previewRect.coords.w > 0 ? this.previewRect.coords.x : this.previewRect.coords.x - rw
+      const ry = this.previewRect.coords.h > 0 ? this.previewRect.coords.y : this.previewRect.coords.y - rh
 
       const bigEnoughRect = rw > 5 && rh > 5
-      if (!bigEnoughRect) return
+      if (!bigEnoughRect) {
+        this.previewRect = null
+        return
+      }
 
-      const newRect = new Rectangle({ x: rx, y: ry, w: rw, h: rh })
+      const newRect = new Rectangle({ x: rx, y: ry, w: rw, h: rh }, "red")
       this.rectangles.push(newRect)
-      console.log("NEW RECT ADDED:", { x: rx, y: ry, w: rw, h: rh })
-
-      // if a circle is colling with this rect, lose level
-      let loseLevel = this.circles.some(c => boolRectCircleColliding(c.coords, newRect.coords))
-      this.levelLost = this.levelLost || loseLevel
+      console.log("NEW RECT ADDED:", this.previewRect)
+      this.previewRect = null
     })
+  }
+
+  checkPreviewRectCollision() {
+    if (!this.previewRect) return
+    const collisionRw = Math.abs(this.previewRect.coords.w)
+    const collisionRh = Math.abs(this.previewRect.coords.h)
+    const collisionRx =
+      this.previewRect.coords.w > 0 ? this.previewRect.coords.x : this.previewRect.coords.x - collisionRw
+    const collisionRy =
+      this.previewRect.coords.h > 0 ? this.previewRect.coords.y : this.previewRect.coords.y - collisionRh
+
+    const test = new Rectangle({ x: collisionRx, y: collisionRy, w: collisionRw, h: collisionRh }, "blue")
+    test.draw(this.ctx)
+
+    let loseLevel = this.circles.some(c =>
+      boolRectCircleColliding(c.coords, { x: collisionRx, y: collisionRy, w: collisionRw, h: collisionRh })
+    )
+    if (loseLevel) console.log("LOOOOOOOST PREVIEWWWW")
+
+    this.levelLost = this.levelLost || loseLevel
   }
 
   drawRectangles() {
     this.rectangles.forEach(r => r.draw(this.ctx))
   }
 
-  previewPlayerRectangle() {
-    if (!this.drawingRect) return
-    this.ctx.strokeStyle = "green"
-    this.ctx.strokeRect(this.playerRectX, this.playerRectY, this.playerRectW, this.playerRectH)
+  drawPreviewRect() {
+    if (!this.previewRect) return
+
+    //this.ctx.fillRect(this.playerRectX, this.playerRectY, this.playerRectW, this.playerRectH)
+    this.previewRect.draw(this.ctx)
   }
 
   updateCircles() {
@@ -114,8 +135,8 @@ export class Game {
   update() {
     this.updateCircles()
     this.drawRectangles()
-    this.previewPlayerRectangle()
+    this.drawPreviewRect()
+    this.checkPreviewRectCollision()
     this.updateDrawAreaCovered()
-    console.log(this.levelLost)
   }
 }
