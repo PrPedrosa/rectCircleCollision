@@ -30,11 +30,6 @@ export class Game {
     this.rectanglesCount = initRectangles.length
     this.circles = createCircles(1, this.ctx)
 
-    this.playerRectX = 0
-    this.playerRectY = 0
-    this.playerRectH = 0
-    this.playerRectW = 0
-    this.drawingRect = false
     this.previewRect = null
 
     // need to paint first to get init Rectangles area
@@ -58,6 +53,10 @@ export class Game {
         const rw = e.x - this.canvasCoords.left - this.previewRect.coords.x
         const rh = e.y - this.canvasCoords.top - this.previewRect.coords.y
 
+        //TEST THIS VALUES WHY NO WORK???????
+        /* const collisionRx = rw > 0 ? this.previewRect.coords.x : this.previewRect.coords.x - Math.abs(rw)
+        const collisionRy = rh > 0 ? this.previewRect.coords.y : this.previewRect.coords.y - Math.abs(rh) */
+
         this.previewRect = new Rectangle(
           { x: this.previewRect.coords.x, y: this.previewRect.coords.y, w: rw, h: rh },
           "green"
@@ -65,7 +64,6 @@ export class Game {
       }
     })
 
-    // get this into a separate fn?
     document.addEventListener("mouseup", _ => {
       if (!this.previewRect) return
 
