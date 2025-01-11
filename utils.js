@@ -18,8 +18,8 @@ export const createCircles = (num, ctx) =>
         r: 15,
         xDir: getRandomInt(),
         yDir: getRandomInt(),
-        speedX: 2,
-        speedY: 2,
+        speedX: 50,
+        speedY: 50,
         ctx,
       })
   )
