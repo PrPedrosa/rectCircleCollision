@@ -5,12 +5,6 @@ import { Rectangle } from "./rectangle.js"
 
 const levelsConfig = [
   {
-    id: 1,
-    winPercentage: 50,
-    circlesDefs: [{ x: canvasWidth / 2, y: canvasHeight / 2, r: 20, xDir: 1, yDir: -1, speedX: 40, speedY: 2 }],
-    rectanglesDefs: [],
-  },
-  {
     id: 2,
     winPercentage: 60,
     circlesDefs: [
@@ -33,6 +27,12 @@ const levelsConfig = [
         h: Math.floor(canvasHeight / 8),
       },
     ],
+  },
+  {
+    id: 1,
+    winPercentage: 50,
+    circlesDefs: [{ x: canvasWidth / 2, y: canvasHeight / 2, r: 20, xDir: 1, yDir: -1, speedX: 40, speedY: 2 }],
+    rectanglesDefs: [],
   },
 ]
 

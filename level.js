@@ -1,17 +1,8 @@
 import { boolRectCircleColliding } from "./boolRectCircleCollide.js"
+import { canvasWidth } from "./definitions.js"
 import { Rectangle } from "./rectangle.js"
-import { createCircles, getAreaCovered } from "./utils.js"
+import { getAreaCovered } from "./utils.js"
 
-// ### possible difficulty factors ###
-// have max num of rectangles on levels
-// balls go faster and bigger (random switching on direction/speed)
-// have init rectangles
-// different percentages to complete level
-
-// maybe make this class Level and pass level num here or level configs fetched from class Game
-// and create class Game that manages levels and other stuff
-
-//Stop moving balls when level lost
 export class Level {
   /**
    * @param {CanvasRenderingContext2D} ctx
@@ -37,6 +28,7 @@ export class Level {
     this.leveWin = false
 
     document.addEventListener("mousedown", e => {
+      console.log("HII", this.id)
       const rx = e.x - this.canvasCoords.left
       const ry = e.y - this.canvasCoords.top
       this.previewRect = new Rectangle({ x: rx, y: ry, w: 0, h: 0 }, "green")
@@ -75,6 +67,8 @@ export class Level {
     })
   }
 
+  bindEventListeners() {}
+
   checkPreviewRectCollision() {
     if (!this.previewRect) return
     const collisionRw = Math.abs(this.previewRect.coords.w)
@@ -98,8 +92,6 @@ export class Level {
 
   drawPreviewRect() {
     if (!this.previewRect) return
-
-    //this.ctx.fillRect(this.playerRectX, this.playerRectY, this.playerRectW, this.playerRectH)
     this.previewRect.draw(this.ctx)
   }
 
@@ -107,14 +99,18 @@ export class Level {
     this.circles.forEach(c => c.update(this.rectangles))
   }
 
-  updateDrawAreaCovered() {
+  updateAreaCovered() {
     if (this.rectanglesCount < this.rectangles.length) {
       this.rectanglesCount = this.rectangles.length
       this.areaCovered = getAreaCovered(this.ctx)
     }
+  }
+
+  drawUI() {
     this.ctx.fillStyle = "white"
     this.ctx.font = "bold 20px serif"
-    this.ctx.fillText(`${this.areaCovered}%`, 10, 40)
+    this.ctx.fillText(`Lvl: ${this.id}`, canvasWidth - 100, 40)
+    this.ctx.fillText(`Area: ${this.areaCovered}% / ${this.areaNeededToWin}%`, 10, 40)
   }
 
   update() {
@@ -122,6 +118,7 @@ export class Level {
     this.drawRectangles()
     this.drawPreviewRect()
     this.checkPreviewRectCollision()
-    this.updateDrawAreaCovered()
+    this.updateAreaCovered()
+    this.drawUI()
   }
 }

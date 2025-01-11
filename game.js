@@ -1,14 +1,22 @@
 import { canvasHeight, canvasWidth } from "./definitions.js"
 import { createLevels } from "./levelsConfig.js"
 
+// ### possible difficulty factors ###
+// have max num of rectangles on levels
+// balls go faster and bigger (random switching on direction/speed)
+// have init rectangles
+// different percentages to complete level
+
+//Stop moving balls when level lost
+// make circle to circle collision?
 export class Game {
   constructor(ctx, canvas) {
     this.ctx = ctx
     this.canvas = canvas
     this.canvasCoords = this.canvas.getBoundingClientRect()
     this.animating = 0
+    // current level is first on array
     this.levels = createLevels(this.ctx, this.canvasCoords)
-    //this.currentLevel = null
 
     this.gameOver = false
   }
@@ -17,21 +25,15 @@ export class Game {
     if (this.levels.some(l => l.levelLost)) this.gameOver = true
   }
 
-  drawCurrentLvl() {
-    this.ctx.fillStyle = "white"
-    this.ctx.font = "bold 20px serif"
-    this.ctx.fillText(`Lvl: ${this.levels[0].id}`, canvasWidth - 100, 40)
-  }
-
   start() {
     this.update()
   }
-  // arrow fn as it needs to call itself, so "this" context is lost?
+
+  // arrow fn as it needs to call itself, so the "this" context is lost?
   update = () => {
     if (!this.levels[0]) throw new Error("No level to animate")
 
     this.ctx.clearRect(0, 0, canvasWidth, canvasHeight)
-    this.drawCurrentLvl()
     this.levels[0].update()
 
     this.isGameOver()
