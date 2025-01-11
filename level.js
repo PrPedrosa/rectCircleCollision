@@ -27,8 +27,15 @@ export class Level {
     this.levelLost = false
     this.leveWin = false
 
+    this.boundListeners = false
+  }
+
+  // Can move into a Controls class if this file gets bloated
+  bindEventListeners() {
+    if (this.boundListeners) return
+    this.boundListeners = true
+
     document.addEventListener("mousedown", e => {
-      console.log("HII", this.id)
       const rx = e.x - this.canvasCoords.left
       const ry = e.y - this.canvasCoords.top
       this.previewRect = new Rectangle({ x: rx, y: ry, w: 0, h: 0 }, "green")
@@ -67,8 +74,7 @@ export class Level {
     })
   }
 
-  bindEventListeners() {}
-
+  // Level lost if colliding
   checkPreviewRectCollision() {
     if (!this.previewRect) return
     const collisionRw = Math.abs(this.previewRect.coords.w)
@@ -81,9 +87,13 @@ export class Level {
     let loseLevel = this.circles.some(c =>
       boolRectCircleColliding(c.coords, { x: collisionRx, y: collisionRy, w: collisionRw, h: collisionRh })
     )
-    if (loseLevel) console.log("LOOOOOOOST PREVIEWWWW")
+    if (loseLevel) console.log("LOOOOOOOST")
 
     this.levelLost = this.levelLost || loseLevel
+  }
+
+  checkWinLevel() {
+    if (Number(this.areaCovered) > this.areaNeededToWin) this.leveWin = true
   }
 
   drawRectangles() {
@@ -114,6 +124,7 @@ export class Level {
   }
 
   update() {
+    this.checkWinLevel()
     this.updateCircles()
     this.drawRectangles()
     this.drawPreviewRect()

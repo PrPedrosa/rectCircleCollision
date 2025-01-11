@@ -7,8 +7,9 @@ import { createLevels } from "./levelsConfig.js"
 // have init rectangles
 // different percentages to complete level
 
-//Stop moving balls when level lost
 // make circle to circle collision?
+// DO SWITCHING LEVELS LOGIC
+// do next level button and win level logic
 export class Game {
   constructor(ctx, canvas) {
     this.ctx = ctx
@@ -22,10 +23,15 @@ export class Game {
   }
 
   isGameOver() {
+    // testing stop when win
+    //if (this.levels[0].leveWin) this.gameOver = true
     if (this.levels.some(l => l.levelLost)) this.gameOver = true
   }
 
+  // WHEN CHANGING LVLS, remember to REMOVE AND bindEventListeners on new level again!!
+  // Search if binding same listeners replaces old!!! no need to remove if so
   start() {
+    this.levels[0].bindEventListeners()
     this.update()
   }
 

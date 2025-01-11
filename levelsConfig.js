@@ -36,6 +36,7 @@ const levelsConfig = [
   },
 ]
 
+// Creates levels for the game based on above config
 export const createLevels = (ctx, canvasCoords) => {
   return levelsConfig.map(
     ({ id, winPercentage, rectanglesDefs, circlesDefs }) =>
