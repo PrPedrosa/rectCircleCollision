@@ -12,16 +12,12 @@ export class Level {
     this.ctx = ctx
     this.canvasCoords = canvasCoords
     this.rectangles = initRects || []
-    this.rectanglesCount = initRects.length || 0
+    this.rectanglesCount = 0
     this.circles = circles
 
     this.previewRect = null
 
-    // need to paint first to get init Rectangles area
-    this.areaCovered = (() => {
-      this.drawRectangles()
-      return getAreaCovered(this.ctx)
-    })()
+    this.areaCovered = "0%"
     this.areaNeededToWin = winPercentage
 
     this.levelLost = false
@@ -42,15 +38,14 @@ export class Level {
     })
 
     document.addEventListener("mousemove", e => {
-      if (this.previewRect) {
-        const rw = e.x - this.canvasCoords.left - this.previewRect.coords.x
-        const rh = e.y - this.canvasCoords.top - this.previewRect.coords.y
+      if (!this.previewRect) return
+      const rw = e.x - this.canvasCoords.left - this.previewRect.coords.x
+      const rh = e.y - this.canvasCoords.top - this.previewRect.coords.y
 
-        this.previewRect = new Rectangle(
-          { x: this.previewRect.coords.x, y: this.previewRect.coords.y, w: rw, h: rh },
-          "green"
-        )
-      }
+      this.previewRect = new Rectangle(
+        { x: this.previewRect.coords.x, y: this.previewRect.coords.y, w: rw, h: rh },
+        "green"
+      )
     })
 
     document.addEventListener("mouseup", _ => {
@@ -62,14 +57,11 @@ export class Level {
       const ry = this.previewRect.coords.h > 0 ? this.previewRect.coords.y : this.previewRect.coords.y - rh
 
       const bigEnoughRect = rw > 5 && rh > 5
-      if (!bigEnoughRect) {
-        this.previewRect = null
-        return
+      if (bigEnoughRect) {
+        const newRect = new Rectangle({ x: rx, y: ry, w: rw, h: rh }, "red")
+        this.rectangles.push(newRect)
+        console.log("NEW RECT ADDED:", newRect)
       }
-
-      const newRect = new Rectangle({ x: rx, y: ry, w: rw, h: rh }, "red")
-      this.rectangles.push(newRect)
-      console.log("NEW RECT ADDED:", this.previewRect)
       this.previewRect = null
     })
   }
@@ -77,6 +69,7 @@ export class Level {
   // Level lost if colliding
   checkPreviewRectCollision() {
     if (!this.previewRect) return
+
     const collisionRw = Math.abs(this.previewRect.coords.w)
     const collisionRh = Math.abs(this.previewRect.coords.h)
     const collisionRx =
@@ -87,7 +80,6 @@ export class Level {
     let loseLevel = this.circles.some(c =>
       boolRectCircleColliding(c.coords, { x: collisionRx, y: collisionRy, w: collisionRw, h: collisionRh })
     )
-    if (loseLevel) console.log("LOOOOOOOST")
 
     this.levelLost = this.levelLost || loseLevel
   }
@@ -105,8 +97,8 @@ export class Level {
     this.previewRect.draw(this.ctx)
   }
 
-  updateCircles() {
-    this.circles.forEach(c => c.update(this.rectangles))
+  updateCircles(elapsed) {
+    this.circles.forEach(c => c.update(this.rectangles, elapsed))
   }
 
   updateAreaCovered() {
@@ -123,9 +115,9 @@ export class Level {
     this.ctx.fillText(`Area: ${this.areaCovered}% / ${this.areaNeededToWin}%`, 10, 40)
   }
 
-  update() {
+  update(elapsed) {
     this.checkWinLevel()
-    this.updateCircles()
+    this.updateCircles(elapsed)
     this.drawRectangles()
     this.drawPreviewRect()
     this.checkPreviewRectCollision()

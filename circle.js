@@ -21,7 +21,7 @@ export class Circle {
     this.color = "blue"
   }
 
-  move() {
+  move(elapsed) {
     const { colliding, rect } = this.isColliding()
     if (colliding) {
       this.color = "green"
@@ -29,8 +29,11 @@ export class Circle {
       this.xDir = collisionVector.x === 0 ? this.xDir : collisionVector.x > 0 ? 1 : -1
       this.yDir = collisionVector.y === 0 ? this.yDir : collisionVector.y > 0 ? 1 : -1
     }
-    this.coords.x = this.coords.x + (this.speedX / 10) * this.xDir
-    this.coords.y = this.coords.y + (this.speedY / 10) * this.yDir
+
+    const distanceX = this.speedX * elapsed
+    const distanceY = this.speedY * elapsed
+    this.coords.x = Number((this.coords.x + distanceX * this.xDir).toFixed(2))
+    this.coords.y = Number((this.coords.y + distanceY * this.yDir).toFixed(2))
   }
 
   isColliding() {
@@ -52,10 +55,10 @@ export class Circle {
     }
   }
 
-  update(rects) {
+  update(rects, elapsed) {
     this.rects = rects
     this.touchingCanvas()
-    this.move()
+    this.move(elapsed)
     this.draw()
   }
 }
