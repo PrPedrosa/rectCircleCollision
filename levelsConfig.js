@@ -8,14 +8,13 @@ const levelsConfig = [
     id: 2,
     winPercentage: 60,
     circlesDefs: [
-      { x: canvasWidth / 2, y: canvasHeight / 2, r: 20, xDir: 1, yDir: -1, speedX: 200, speedY: 70 },
       {
-        x: Math.floor(canvasWidth / 10),
-        y: Math.floor(canvasHeight / 10),
+        x: Math.floor(canvasWidth / 1.1),
+        y: Math.floor(canvasHeight / 1.1),
         r: 20,
         xDir: 1,
-        yDir: 1,
-        speedX: 30,
+        yDir: -1,
+        speedX: 300,
         speedY: 10,
       },
     ],

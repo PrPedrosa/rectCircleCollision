@@ -46,11 +46,24 @@ export class Circle {
     return { colliding: false }
   }
 
+  // if touching canvas walls, reverse direction
   touchingCanvas() {
-    if (this.coords.x + this.coords.r > canvasWidth || this.coords.x - this.coords.r < 0) {
+    console.log(this.coords)
+    if (this.coords.x + this.coords.r > canvasWidth) {
+      this.coords.x = canvasWidth - this.coords.r
       this.xDir = -this.xDir
     }
-    if (this.coords.y + this.coords.r > canvasHeight || this.coords.y - this.coords.r < 0) {
+    if (this.coords.x - this.coords.r < 0) {
+      this.coords.x = this.coords.r
+      this.xDir = -this.xDir
+    }
+
+    if (this.coords.y + this.coords.r > canvasHeight) {
+      this.coords.y = canvasHeight - this.coords.r
+      this.yDir = -this.yDir
+    }
+    if (this.coords.y - this.coords.r < 0) {
+      this.coords.y = this.coords.r
       this.yDir = -this.yDir
     }
   }
