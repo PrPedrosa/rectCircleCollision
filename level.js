@@ -24,44 +24,51 @@ export class Level {
     this.boundListeners = false
   }
 
+  mousedown = e => {
+    const rx = e.x - this.canvasCoords.left
+    const ry = e.y - this.canvasCoords.top
+    this.previewRect = new Rectangle({ x: rx, y: ry, w: 0, h: 0 }, "green")
+  }
+  mousemove = e => {
+    if (!this.previewRect) return
+    const rw = e.x - this.canvasCoords.left - this.previewRect.coords.x
+    const rh = e.y - this.canvasCoords.top - this.previewRect.coords.y
+
+    this.previewRect = new Rectangle(
+      { x: this.previewRect.coords.x, y: this.previewRect.coords.y, w: rw, h: rh },
+      "green"
+    )
+  }
+  mouseup = () => {
+    if (!this.previewRect) return
+
+    const rw = Math.abs(this.previewRect.coords.w)
+    const rh = Math.abs(this.previewRect.coords.h)
+    const rx = this.previewRect.coords.w > 0 ? this.previewRect.coords.x : this.previewRect.coords.x - rw
+    const ry = this.previewRect.coords.h > 0 ? this.previewRect.coords.y : this.previewRect.coords.y - rh
+
+    const bigEnoughRect = rw > 5 && rh > 5
+    if (bigEnoughRect) {
+      const newRect = new Rectangle({ x: rx, y: ry, w: rw, h: rh }, "red")
+      this.rectangles.push(newRect)
+      console.log("NEW RECT ADDED:", newRect)
+    }
+    this.previewRect = null
+  }
+
   // Can move into a Controls class if this file gets bloated
   bindEventListeners() {
     if (this.boundListeners) return
     this.boundListeners = true
+    document.addEventListener("mousedown", this.mousedown)
+    document.addEventListener("mousemove", this.mousemove)
+    document.addEventListener("mouseup", this.mouseup)
+  }
 
-    document.addEventListener("mousedown", e => {
-      const rx = e.x - this.canvasCoords.left
-      const ry = e.y - this.canvasCoords.top
-      this.previewRect = new Rectangle({ x: rx, y: ry, w: 0, h: 0 }, "green")
-    })
-
-    document.addEventListener("mousemove", e => {
-      if (!this.previewRect) return
-      const rw = e.x - this.canvasCoords.left - this.previewRect.coords.x
-      const rh = e.y - this.canvasCoords.top - this.previewRect.coords.y
-
-      this.previewRect = new Rectangle(
-        { x: this.previewRect.coords.x, y: this.previewRect.coords.y, w: rw, h: rh },
-        "green"
-      )
-    })
-
-    document.addEventListener("mouseup", _ => {
-      if (!this.previewRect) return
-
-      const rw = Math.abs(this.previewRect.coords.w)
-      const rh = Math.abs(this.previewRect.coords.h)
-      const rx = this.previewRect.coords.w > 0 ? this.previewRect.coords.x : this.previewRect.coords.x - rw
-      const ry = this.previewRect.coords.h > 0 ? this.previewRect.coords.y : this.previewRect.coords.y - rh
-
-      const bigEnoughRect = rw > 5 && rh > 5
-      if (bigEnoughRect) {
-        const newRect = new Rectangle({ x: rx, y: ry, w: rw, h: rh }, "red")
-        this.rectangles.push(newRect)
-        console.log("NEW RECT ADDED:", newRect)
-      }
-      this.previewRect = null
-    })
+  removeEventListeners() {
+    document.removeEventListener("mousedown", this.mousedown)
+    document.removeEventListener("mousemove", this.mousemove)
+    document.removeEventListener("mouseup", this.mouseup)
   }
 
   // Level lost if colliding

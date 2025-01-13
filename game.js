@@ -1,4 +1,4 @@
-import { canvasHeight, canvasWidth } from "./definitions.js"
+import { canvasHeight, canvasWidth, SWITCH_LVL_ANIMATION_TIMER } from "./definitions.js"
 import { createLevels } from "./levelsConfig.js"
 
 // ### possible difficulty factors ###
@@ -33,25 +33,33 @@ export class Game {
 
   checkGameOutcome() {
     this.gameOver = this.currentLevel?.levelLost ?? false
-    if (this.currentLevel.leveWin && this.levels.length) {
+    if (this.currentLevel.leveWin /* && this.levels.length */) {
       this.isSwitchingLvls = true
     }
   }
 
   switchLevelAnimation(elapsed) {
-    console.log(this.countdown)
-    if (this.isSwitchingLvls) {
-      console.log(this.isSwitchingLvls)
+    // if no more levels, won game
+    if (!this.levels[0]) {
+      this.wonGame = true
+      cancelAnimationFrame(this.update)
+      this.animating = 0
+      return
+    }
 
+    // DRAW COUNTDOWN
+    if (this.isSwitchingLvls) {
       const countdown = Math.ceil(3 - this.countdown)
       this.countdown += elapsed
       this.ctx.fillStyle = "white"
       this.ctx.font = "bold 34px serif"
       this.ctx.fillText(countdown, canvasWidth / 2, canvasHeight / 2)
     }
-    if (this.countdown > 3) {
-      console.log("HIIIIIII")
+
+    // actual switch levels when countdown over
+    if (this.countdown > SWITCH_LVL_ANIMATION_TIMER) {
       this.isSwitchingLvls = false
+      this.currentLevel.removeEventListeners()
 
       this.currentLevel = this.levels[0]
       this.levels.shift()
@@ -88,7 +96,7 @@ export class Game {
     this.time += elapsedInSeconds
 
     this.ctx.clearRect(0, 0, canvasWidth, canvasHeight)
-    if (!this.isSwitchingLvls) {
+    if (!this.isSwitchingLvls && this.currentLevel) {
       this.currentLevel.update(elapsedInSeconds)
     }
     this.switchLevelAnimation(elapsedInSeconds)
