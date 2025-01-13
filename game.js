@@ -26,11 +26,39 @@ export class Game {
 
     this.gameOver = false
     this.wonGame = false
+
+    this.countdown = 0
+    this.isSwitchingLvls = false
   }
 
   checkGameOutcome() {
-    this.gameOver = this.currentLevel?.levelLost
-    this.wonGame = this.currentLevel?.leveWin
+    this.gameOver = this.currentLevel?.levelLost ?? false
+    if (this.currentLevel.leveWin && this.levels.length) {
+      this.isSwitchingLvls = true
+    }
+  }
+
+  switchLevelAnimation(elapsed) {
+    console.log(this.countdown)
+    if (this.isSwitchingLvls) {
+      console.log(this.isSwitchingLvls)
+
+      const countdown = Math.ceil(3 - this.countdown)
+      this.countdown += elapsed
+      this.ctx.fillStyle = "white"
+      this.ctx.font = "bold 34px serif"
+      this.ctx.fillText(countdown, canvasWidth / 2, canvasHeight / 2)
+    }
+    if (this.countdown > 3) {
+      console.log("HIIIIIII")
+      this.isSwitchingLvls = false
+
+      this.currentLevel = this.levels[0]
+      this.levels.shift()
+      this.currentLevel.bindEventListeners()
+
+      this.countdown = 0
+    }
   }
 
   // WHEN CHANGING LVLS, remember to REMOVE AND bindEventListeners on new level again!!
@@ -42,14 +70,12 @@ export class Game {
     requestAnimationFrame(this.update)
   }
 
-  startLevelAnimation() {}
-
   // arrow fn as it needs to call itself, sooo "this" context is lost??
   update = timestamp => {
-    if (!this.levels[0]) throw new Error("No level to animate")
+    if (!this.currentLevel) throw new Error("No level to animate")
 
     this.checkGameOutcome()
-    if (this.gameOver || this.wonGame) {
+    if (this.gameOver) {
       console.log({ LOST: this.gameOver, WON: this.wonGame })
       cancelAnimationFrame(this.animating)
       this.animating = 0
@@ -62,7 +88,10 @@ export class Game {
     this.time += elapsedInSeconds
 
     this.ctx.clearRect(0, 0, canvasWidth, canvasHeight)
-    this.currentLevel.update(elapsedInSeconds)
+    if (!this.isSwitchingLvls) {
+      this.currentLevel.update(elapsedInSeconds)
+    }
+    this.switchLevelAnimation(elapsedInSeconds)
 
     this.animating = requestAnimationFrame(this.update)
   }

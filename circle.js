@@ -46,9 +46,9 @@ export class Circle {
     return { colliding: false }
   }
 
-  // if touching canvas walls, reverse direction
+  // if touching canvas walls, set coords to canvas wall and reverse direction
+  // so that it does not grab the wall
   touchingCanvas() {
-    console.log(this.coords)
     if (this.coords.x + this.coords.r > canvasWidth) {
       this.coords.x = canvasWidth - this.coords.r
       this.xDir = -this.xDir

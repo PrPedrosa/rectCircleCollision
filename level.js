@@ -4,11 +4,9 @@ import { Rectangle } from "./rectangle.js"
 import { getAreaCovered } from "./utils.js"
 
 export class Level {
-  /**
-   * @param {CanvasRenderingContext2D} ctx
-   */
   constructor({ ctx, canvasCoords, id, initRects, circles, winPercentage }) {
     this.id = id
+    /** @type {CanvasRenderingContext2D} */
     this.ctx = ctx
     this.canvasCoords = canvasCoords
     this.rectangles = initRects || []
