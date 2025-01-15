@@ -45,3 +45,9 @@ export const getAreaCovered = ctx => {
 
   return ((redPixels / totalPixels) * 100).toFixed(2)
 }
+
+export const fillText = (ctx, text, color, font, x, y) => {
+  ctx.fillStyle = color
+  ctx.font = font
+  ctx.fillText(text, x, y)
+}
