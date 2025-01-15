@@ -113,6 +113,7 @@ export class Level {
     }
   }
 
+  // Pass this to game class
   drawUI() {
     this.ctx.fillStyle = "white"
     this.ctx.font = "bold 20px serif"
