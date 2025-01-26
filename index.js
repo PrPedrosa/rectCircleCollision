@@ -1,10 +1,6 @@
-import { canvasHeight, canvasWidth } from "./definitions.js"
+//import { canvasHeight, canvasWidth } from "./definitions.js"
+import { canvas } from "./definitions.js"
 import { Game } from "./game.js"
-
-/** @type {HTMLCanvasElement} */
-const canvas = document.getElementById("canvas")
-canvas.width = canvasWidth
-canvas.height = canvasHeight
 
 /** @type {CanvasRenderingContext2D} */
 const ctx = canvas.getContext("2d", { willReadFrequently: true }) // test "with/without" flag, console warnings "without"

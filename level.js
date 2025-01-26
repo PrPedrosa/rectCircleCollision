@@ -1,5 +1,5 @@
 import { boolRectCircleColliding } from "./boolRectCircleCollide.js"
-import { canvasWidth } from "./definitions.js"
+import { canvasHeight, canvasWidth } from "./definitions.js"
 import { Rectangle } from "./rectangle.js"
 import { getAreaCovered } from "./utils.js"
 
@@ -24,15 +24,24 @@ export class Level {
     this.boundListeners = false
   }
 
+  //xScale and yScale allow for canvas to not strictly be 800x600
+  //try to not set any canvas width or height??
   mousedown = e => {
-    const rx = e.x - this.canvasCoords.left
-    const ry = e.y - this.canvasCoords.top
+    const xScale = this.canvasCoords.width / canvasWidth
+    const yScale = this.canvasCoords.height / canvasHeight
+
+    const rx = (e.x - this.canvasCoords.left) / xScale
+    const ry = (e.y - this.canvasCoords.top) / yScale
+
     this.previewRect = new Rectangle({ x: rx, y: ry, w: 0, h: 0 }, "green")
   }
   mousemove = e => {
     if (!this.previewRect) return
-    const rw = e.x - this.canvasCoords.left - this.previewRect.coords.x
-    const rh = e.y - this.canvasCoords.top - this.previewRect.coords.y
+    const xScale = this.canvasCoords.width / canvasWidth
+    const yScale = this.canvasCoords.height / canvasHeight
+    const rw = e.x - this.canvasCoords.left - this.previewRect.coords.x * xScale
+    const rh = e.y - this.canvasCoords.top - this.previewRect.coords.y * yScale
+    console.log({ x: this.previewRect.coords.x, y: this.previewRect.coords.y, w: rw, h: rh })
 
     this.previewRect = new Rectangle(
       { x: this.previewRect.coords.x, y: this.previewRect.coords.y, w: rw, h: rh },

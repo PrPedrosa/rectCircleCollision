@@ -18,6 +18,7 @@ export class Game {
     this.ctx = ctx
     this.canvas = canvas
     this.canvasCoords = this.canvas.getBoundingClientRect()
+    console.log("COORDS CABVAS", this.canvasCoords)
     this.animating = 0
 
     this.timestamp = null
@@ -26,6 +27,7 @@ export class Game {
     this.elapsedInSeconds = 0
 
     this.levels = createLevels(this.ctx, this.canvasCoords)
+    this.totalLevels = this.levels.length
     this.lastLevelId = this.levels[this.levels.length - 1].id
     this.currentLevel = null
 
