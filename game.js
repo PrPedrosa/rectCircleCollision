@@ -8,7 +8,6 @@ import { SwitchLvlAnimation } from "./switchLvlAnimation.js"
 // have init rectangles
 // different percentages to complete level
 // time limit to complete level
-
 // make circle to circle collision?
 
 // do next level button and win level logic
@@ -18,7 +17,6 @@ export class Game {
     this.ctx = ctx
     this.canvas = canvas
     this.canvasCoords = this.canvas.getBoundingClientRect()
-    console.log("COORDS CABVAS", this.canvasCoords)
     this.animating = 0
 
     this.timestamp = null

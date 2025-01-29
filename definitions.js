@@ -1,7 +1,5 @@
 /** @type {HTMLCanvasElement} */
 export const canvas = document.getElementById("canvas")
-canvas.width = 800
-canvas.height = 600
 export const canvasWidth = canvas.width
 export const canvasHeight = canvas.height
 
